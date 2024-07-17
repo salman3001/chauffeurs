@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
 import { globalContext } from "./globalContext";
-import { userController } from "./users/users.controller";
+import { userController } from "./controllers/users.controller";
 import swagger from "@elysiajs/swagger";
 
 const app = new Elysia()

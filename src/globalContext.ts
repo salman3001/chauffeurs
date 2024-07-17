@@ -1,29 +1,35 @@
 import Elysia, { t } from "elysia";
 import { staticPlugin } from "@elysiajs/static";
 import { execeptionHandler } from "./utills/exceptions/exceptionHandler";
-import { swagger } from "@elysiajs/swagger";
+import { customRes } from "./utills/decorates/customRes";
 
-export const globalContext = new Elysia({ name: "globalContext" })
+const tempDto = t.Object({
+  name: t.Number({ error: "Must be a number" }),
+  age: t.Object({
+    one: t.String({ error: "should be string" }),
+    two: t.String({ error: "should be string" }),
+  }),
+});
+
+export const globalContext = new Elysia({
+  name: "globalContext",
+  tags: ["Default"],
+})
   .use(staticPlugin())
-  .use(swagger())
+  .use(customRes)
   .post(
     "/temp",
-    async ({ body, request }) => {
-      console.log(body);
+    async ({ body, request, set, customRes }) => {
+      throw new Error();
+      return body;
     },
     {
-      body: t.Object({
-        name: t.Number({ error: "should be number" }),
-        age: t.Object({
-          one: t.String({ error: { age: { one: "should be string" } } }),
-          two: t.String({ error: "should be string" }),
-        }),
-      }),
+      body: tempDto,
     },
   )
   .get(
     "/temp/:id",
-    ({ params }) => {
+    ({ params, set }) => {
       console.log(params.id);
     },
     {
@@ -32,6 +38,6 @@ export const globalContext = new Elysia({ name: "globalContext" })
       }),
     },
   )
+  .use(execeptionHandler)
 
-  .route("ALL", "*", () => "Not found")
-  .use(execeptionHandler);
+  .route("ALL", "*", () => "Not found");

@@ -3,7 +3,7 @@ import { Database } from "bun:sqlite";
 import { resolve } from "path";
 import * as schema from "./schemas";
 
-const dbPath = resolve(import.meta.dir, "data/sqlite.db");
+const dbPath = resolve(process.cwd(), "data/sqlite.db");
 
 const sqlite = new Database(dbPath);
-export const db = drizzle(sqlite, { schema });
+export const db = drizzle(sqlite, { schema, logger: true });

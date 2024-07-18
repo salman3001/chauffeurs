@@ -16,11 +16,13 @@ export const execeptionHandler = new Elysia({
     set.status = "Unprocessable Content";
     return errObj;
   }
+  console.log(error);
 
   const errObj: Omit<CustomResOptions, "code"> = {
     success: false,
     message: "Server Error",
   };
+
   set.status = "Internal Server Error";
 
   return errObj;

@@ -1,49 +1,67 @@
-import { asc, desc } from "drizzle-orm";
+import { SQL, SQLWrapper, asc, desc, ilike, or, sql } from "drizzle-orm";
 import { BunSQLiteDatabase } from "drizzle-orm/bun-sqlite";
-import { SQLiteSelectQueryBuilder } from "drizzle-orm/sqlite-core";
-import { Config } from "src/config/Config";
+import { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
+import { config as globalConfig } from "src/config/config";
 
 export class BaseRepository<T extends Record<string, unknown>> {
   constructor(protected readonly db: BunSQLiteDatabase<T>) {}
 
-  config = new Config();
+  protected config = globalConfig;
 
-  async paginate(qb: SQLiteSelectQueryBuilder, query?: BaseQueryFilter) {
-    let take = this.config.common.defualtPerPage;
+  protected getLimitOffset(query?: BaseQueryFilter) {
+    let perPage = this.config.common.defualtPerPage;
     if (query?.perPage) {
-      take = query.perPage;
+      perPage = query.perPage;
     }
 
-    const skip = ((query?.page || 1) - 1) * take;
+    const offset = ((query?.page || 1) - 1) * perPage;
 
-    if (skip) {
-      qb.skip(skip);
-    }
-
-    if (take) {
-      qb.take(take);
-    }
-
-    const results = await qb.getMany();
-    const count = await qb.getCount();
-
-    return { results, count, perPage: take };
+    return { perPage, offset, page: query?.page || 1 };
   }
 
-  orderBy(qb: SQLiteSelectQueryBuilder, query?: BaseQueryFilter) {
-    if (query?.orderBy && query?.orderBy?.length > 0) {
+  protected getOrderByQueryArray(
+    table: SQLiteTableWithColumns<any>,
+    allowedKeys: string[],
+    query?: BaseQueryFilter,
+  ) {
+    const orderByQueryArray: SQL[] = [];
+
+    if (query?.orderBy) {
       query?.orderBy?.forEach((order: string) => {
         const [orderBy, orderDirection] = order.split(":");
-        const orderByfun =
-          orderDirection === "asc"
-            ? asc(orderBy)
-            : orderDirection === "desc"
-            ? desc(orderBy)
-            : orderBy;
 
-        qb.orderBy(`${alias}.${orderBy}`, orderDirection as "DESC");
+        allowedKeys.forEach((key) => {
+          if (orderBy === key) {
+            const orderByQuery =
+              orderDirection === "asc"
+                ? asc(table[key])
+                : orderDirection === "desc"
+                ? desc(table[key])
+                : null;
+
+            if (orderByQuery !== null) orderByQueryArray.push(orderByQuery);
+          }
+        });
       });
     }
+
+    return orderByQueryArray;
+  }
+
+  protected getSearchQuery(
+    table: SQLiteTableWithColumns<any>,
+    allowedKeys: string[],
+    query?: BaseQueryFilter,
+  ) {
+    let searchQuery: SQLWrapper[] = [];
+
+    if (query?.search) {
+      allowedKeys.forEach((key) => {
+        searchQuery.push(ilike(table[key], `%${query.search}%`));
+      });
+    }
+
+    return or(...searchQuery);
   }
 }
 
@@ -51,4 +69,5 @@ export class BaseQueryFilter {
   page?: number;
   perPage?: number;
   orderBy?: string[];
+  search?: string;
 }

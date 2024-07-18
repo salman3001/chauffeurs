@@ -6,7 +6,7 @@ export class EnvConfig {
     nodeEnv: process.env.NODE_ENV,
   };
 
-  get(key: keyof Env["variables"]) {
+  get(key: keyof EnvConfig["variables"]) {
     return this.variables[key];
   }
 

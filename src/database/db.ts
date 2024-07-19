@@ -6,4 +6,4 @@ import * as schema from "./schemas";
 const dbPath = resolve(process.cwd(), "data/sqlite.db");
 
 const sqlite = new Database(dbPath);
-export const db = drizzle(sqlite, { schema, logger: true });
+export const db = drizzle(sqlite, { schema });

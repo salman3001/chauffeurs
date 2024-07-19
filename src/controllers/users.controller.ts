@@ -1,6 +1,5 @@
 import Elysia from "elysia";
 import { globalContext } from "../globalContext";
-import { UserService } from "src/services/userService";
 import {
   createUserSchema,
   userFilterQuerySchema,
@@ -15,11 +14,11 @@ export const userController = new Elysia({
   .use(globalContext)
   .get(
     "/",
-    async ({ customRes, userService, query }) => {
+    async ({ userService, query, customRes }) => {
       const users = await userService.getAllUsers(query);
       return customRes({
-        code: "Found",
         success: true,
+        code: 200,
         data: users,
       });
     },

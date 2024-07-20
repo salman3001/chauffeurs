@@ -5,6 +5,7 @@ import { customRes } from "./utills/decorates/customRes";
 import { UserService } from "./services/userService";
 import { UserRepository } from "./repositories/user.repository";
 import { db } from "./database/db";
+import html from "@elysiajs/html";
 
 //repositories
 const userRepo = new UserRepository(db);
@@ -15,6 +16,7 @@ export const globalContext = new Elysia({
   tags: ["Default"],
 })
   .use(staticPlugin())
+  .use(html())
   .use(customRes)
   // services
   .decorate("userService", userService)

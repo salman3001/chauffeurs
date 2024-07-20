@@ -4,6 +4,7 @@ import {
   createUserSchema,
   userFilterQuerySchema,
 } from "src/validationSchemas/user.schema";
+import { Home } from "src/client/pages/Home";
 
 export const userController = new Elysia({
   prefix: "/users",
@@ -16,11 +17,7 @@ export const userController = new Elysia({
     "/",
     async ({ userService, query, customRes }) => {
       const users = await userService.getAllUsers(query);
-      return customRes({
-        success: true,
-        code: 200,
-        data: users,
-      });
+      return Home();
     },
     { query: userFilterQuerySchema },
   )

@@ -4,21 +4,31 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/app.ts",
+    "build:client": "bun build src/client/assets/scripts/main.ts --outdir ./public/scripts --watch",
+    "watch:css": "sass --watch ./src/client/assets/styles/main.scss ./public/styles/main.css",
     "db:generate": "drizzle-kit generate",
     "db:drop": "drizzle-kit drop",
     "db:migrate": "bun run src/database/migrate.ts",
     "db:inspect": "drizzle-kit studio"
   },
   "dependencies": {
+    "@alpinejs/persist": "^3.14.1",
+    "@elysiajs/html": "^1.1.0",
     "@elysiajs/static": "^1.0.3",
     "@elysiajs/swagger": "^1.0.5",
+    "@kitajs/ts-html-plugin": "^4.0.1",
     "@libsql/client": "^0.7.0",
+    "alpinejs": "^3.14.1",
+    "bootstrap": "^5.3.3",
     "drizzle-orm": "^0.32.0",
     "elysia": "latest"
   },
   "devDependencies": {
+    "@types/alpinejs": "^3.13.10",
+    "@types/bootstrap": "^5.2.10",
     "bun-types": "latest",
-    "drizzle-kit": "^0.23.0"
+    "drizzle-kit": "^0.23.0",
+    "sass": "^1.77.8"
   },
   "module": "src/app.ts"
 }
